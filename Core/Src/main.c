@@ -27,6 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "bmp2_config.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 /* USER CODE END Includes */
 
@@ -53,13 +54,9 @@ int newTemp = 0;
 int output;
 float preassure;
 int newPreassure = 0;
-uint8_t dane[128];
+char dane[128];
 
-
-
-
-float set_point = 35.0;
-//Opcje regulatora
+float set_point = 25.0;
 float kp = 0.7093;
 float ki = 1/333.666;
 float kd = 0.0;
@@ -67,21 +64,19 @@ float kd = 0.0;
 float I, prev_I = 0.0;
 float error, error_p, prev_error = 0.0;
 float pwm_i, pwm_p = 0.0;
-float dt = 0.001;
+float dt = 0.1;
 
 
 float PWMValue = 0;
 float error = 0;
+char message[] = "%d, %d, %d\r\n";
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if(htim==&htim2)
   {
-//	  preassure = BMP2_ReadPressure_hPa(&bmp2dev_1);
 	  temp = BMP2_ReadTemperature_degC(&bmp2dev_1);
 	  newTemp = (int)(temp*1000);
 	  error = set_point - temp;
-//	  if(error > -5 && error < 5){
-//	  }
 	  I += error+prev_error;
 	  pwm_i = I*ki*(dt/2.0);
 	  prev_error = error;
@@ -94,22 +89,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  PWMValue = 0;
 	  }
 	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (int)PWMValue);
-//	  newPreassure = (int)(preassure*1000);
-//	  int afterKropkaTemp = newTemp%1000;
-//	  int afterKropkaPressure = newPreassure%1000;
-	  int daneD=sprintf(dane,"%d\r\n",newTemp);
+	  int daneD=sprintf(&dane,&message,newTemp, (int)PWMValue, (int)(error*1000));
 	  HAL_UART_Transmit_IT(&huart3,(uint8_t*)dane , daneD);
   }
 }
 
 //unsigned char PWM[6];
-//int duty = 0;
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//    duty = strtol((unsigned char*)&PWM[3], NULL, 10);
-//    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, duty*10);
-//    HAL_UART_Receive_IT(&huart3,(unsigned char*)PWM , 6);
-//}
+float testValue = 0.0;
+uint8_t userSettings[4];
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	set_point = atof((char *)userSettings);
+    HAL_UART_Receive_IT(&huart3,&userSettings ,4);
+
+}
 
 
 
@@ -163,7 +156,7 @@ int main(void)
   BMP2_Init(&bmp2dev_1);
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-//  HAL_UART_Receive_IT(&huart3,(unsigned char*)PWM , 6);
+  HAL_UART_Receive_IT(&huart3,&userSettings,4);
 
   /* USER CODE END 2 */
 
@@ -171,10 +164,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	temp = BMP2_ReadTemperature_degC(&bmp2dev_1);
-//	HAL_Delay(1000);
-//	HAL_Delay(500);
-//	PWMValue += output;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
