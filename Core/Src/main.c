@@ -60,13 +60,14 @@ uint8_t dane[128];
 
 float set_point = 35.0;
 //Opcje regulatora
-float kp = 3.0;
-float ki = 0.00005;
+float kp = 0.7093;
+float ki = 1/333.666;
 float kd = 0.0;
 
 float I, prev_I = 0.0;
 float error, error_p, prev_error = 0.0;
 float pwm_i, pwm_p = 0.0;
+float dt = 0.001;
 
 
 float PWMValue = 0;
@@ -77,13 +78,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
 //	  preassure = BMP2_ReadPressure_hPa(&bmp2dev_1);
 	  temp = BMP2_ReadTemperature_degC(&bmp2dev_1);
-//	  newTemp = (int)(temp*1000);
+	  newTemp = (int)(temp*1000);
 	  error = set_point - temp;
-	  if(error > -3 && error < 3){
-		  I = prev_I+error+prev_error;
-	  }
-	  pwm_i = I*ki;
-	  prev_I = I;
+//	  if(error > -5 && error < 5){
+//	  }
+	  I += error+prev_error;
+	  pwm_i = I*ki*(dt/2.0);
 	  prev_error = error;
 	  pwm_p = kp*error;
 	  PWMValue = 100*(pwm_p + pwm_i);
@@ -97,8 +97,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //	  newPreassure = (int)(preassure*1000);
 //	  int afterKropkaTemp = newTemp%1000;
 //	  int afterKropkaPressure = newPreassure%1000;
-//	  int daneD=sprintf(dane,"%d\r\n",newTemp);
-//	  HAL_UART_Transmit_IT(&huart3,(uint8_t*)dane , daneD);
+	  int daneD=sprintf(dane,"%d\r\n",newTemp);
+	  HAL_UART_Transmit_IT(&huart3,(uint8_t*)dane , daneD);
   }
 }
 

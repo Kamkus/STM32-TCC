@@ -60,8 +60,8 @@ all: main-build
 main-build: TCC.elf secondary-outputs
 
 # Tool invocations
-TCC.elf TCC.map: $(OBJS) $(USER_OBJS) D:\Projekt\ SM\STM32-TCC\STM32F746ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "TCC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"D:\Projekt SM\STM32-TCC\STM32F746ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TCC.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+TCC.elf TCC.map: $(OBJS) $(USER_OBJS) C:\Users\okiok\Documents\GitHub\STM32-TCC\STM32F746ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "TCC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\okiok\Documents\GitHub\STM32-TCC\STM32F746ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TCC.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
