@@ -51,9 +51,6 @@
 /* USER CODE BEGIN PV */
 float temp;    // [degC]
 int newTemp = 0;
-int output;
-float preassure;
-int newPreassure = 0;
 char dane[128];
 
 float set_point = 25.0;
@@ -65,10 +62,24 @@ float I, prev_I = 0.0;
 float error, error_p, prev_error = 0.0;
 float pwm_i, pwm_p = 0.0;
 float dt = 0.1;
-
+float error = 0;
+float CalculatePWMValue(float temp){
+	error = set_point - temp;
+	I += error+prev_error;
+	pwm_i = I*ki*(dt/2.0);
+	prev_error = error;
+	pwm_p = kp*error;
+	float helpPWMValue = 100*(pwm_p + pwm_i);
+	if (helpPWMValue > 999) {
+		helpPWMValue = 1000;
+	}
+	if(helpPWMValue < 0){
+		helpPWMValue = 0;
+	}
+	return helpPWMValue;
+}
 
 float PWMValue = 0;
-float error = 0;
 char message[] = "%d, %d, %d\r\n";
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -76,18 +87,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
 	  temp = BMP2_ReadTemperature_degC(&bmp2dev_1);
 	  newTemp = (int)(temp*1000);
-	  error = set_point - temp;
-	  I += error+prev_error;
-	  pwm_i = I*ki*(dt/2.0);
-	  prev_error = error;
-	  pwm_p = kp*error;
-	  PWMValue = 100*(pwm_p + pwm_i);
-	  if (PWMValue > 999) {
-		  PWMValue = 1000;
-	  }
-	  if(PWMValue < 0){
-		  PWMValue = 0;
-	  }
+//	  error = set_point - temp;
+//	  I += error+prev_error;
+//	  pwm_i = I*ki*(dt/2.0);
+//	  prev_error = error;
+//	  pwm_p = kp*error;
+//	  PWMValue = 100*(pwm_p + pwm_i);
+//	  if (PWMValue > 999) {
+//		  PWMValue = 1000;
+//	  }
+//	  if(PWMValue < 0){
+//		  PWMValue = 0;
+//	  }
+	  PWMValue = CalculatePWMValue(temp);
 	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (int)PWMValue);
 	  int daneD=sprintf(&dane,&message,newTemp, (int)PWMValue, (int)(error*1000));
 	  HAL_UART_Transmit_IT(&huart3,(uint8_t*)dane , daneD);
@@ -95,7 +107,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 }
 
 //unsigned char PWM[6];
-float testValue = 0.0;
 uint8_t userSettings[4];
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
