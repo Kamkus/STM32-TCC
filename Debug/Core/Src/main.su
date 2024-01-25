@@ -1,5 +1,6 @@
-../Core/Src/main.c:74:6:HAL_TIM_PeriodElapsedCallback	40	static
-../Core/Src/main.c:102:6:HAL_UART_RxCpltCallback	16	static
-../Core/Src/main.c:131:5:main	8	static
-../Core/Src/main.c:186:6:SystemClock_Config	88	static
-../Core/Src/main.c:246:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:66:7:CalculatePWMValue	32	static
+../Core/Src/main.c:84:6:HAL_TIM_PeriodElapsedCallback	32	static
+../Core/Src/main.c:111:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/main.c:138:5:main	8	static
+../Core/Src/main.c:189:6:SystemClock_Config	88	static
+../Core/Src/main.c:249:6:Error_Handler	4	static,ignoring_inline_asm

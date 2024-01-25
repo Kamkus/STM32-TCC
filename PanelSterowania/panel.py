@@ -2,6 +2,7 @@ from turtle import Screen, title
 from tkinter import *
 from serialport import SerialPort
 from matplotlib.figure import Figure
+import csv
 import matplotlib.pyplot as plt
 import re
 VALUES = {
@@ -10,7 +11,8 @@ VALUES = {
 COMMANDS={
     'SET_TEMPERATURE' : lambda panel, message : panel.sendTempSetting(),
     'SHOW_PLOT' : lambda panel, message : panel.showPlot(message),
-    'CLEAR_DATA': lambda panel,message : panel.clearData()
+    'CLEAR_DATA': lambda panel,message : panel.clearData(),
+    'SAVE_DATA': lambda panel,message : panel.saveData(),
 }
 
 def checkFormat(string):
@@ -101,3 +103,9 @@ class Panel:
         elif valueToSend < 25.0:
             self.yRef.set('25.0')
         self.serialPort.sendMessage(str(self.yRef.get()))
+    def saveData(self):
+        with open("data.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["TIME", "PWM", "UCHYB", "TEMP"])
+            for i in range(len(self.data['TIME'])):
+                writer.writerow([self.data['TIME'][i], self.data['PWM'][i], self.data["UCHYB"][i], self.data["TEMP"][i]]);

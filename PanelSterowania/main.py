@@ -5,15 +5,14 @@ from time import sleep
 import threading
 import matplotlib.pyplot as plot
 closed = False
-def showPlot(screen):
+def readValues(screen):
     while not closed:
         screen.readLine()
-        sleep(0.1)
     
 
 
 # screen.exitonclick()
-screen = Panel(600, 250, "COM3")
+screen = Panel(600, 250, "COM5")
 # button = Button(screen.screen.getcanvas().master, text="Exit", command=showPlot)
 # button.pack()
 screen.createInputBox("yREF[°C]", screen.yRef, 20, 100-70, "normal")
@@ -25,8 +24,9 @@ screen.createButton("Wyczyść Dane", 'CLEAR_DATA','ALL', 20, 220-70)
 screen.createButton("Wykres [Temp]", 'SHOW_PLOT','TEMP', 110, 220-70)
 screen.createButton("Wykres [Uchyb]", 'SHOW_PLOT','UCHYB', 205, 220-70)
 screen.createButton("Wykres [PWM]", 'SHOW_PLOT','PWM', 305, 220-70)
+screen.createButton("Zapisz dane", 'SAVE_DATA','', 405, 220-70)
 # screen.createButton("Wykres [PWm]", 'CLEAR_DATA','DUPA', 200, 190)
-x = threading.Thread(target=showPlot, args=[screen])
+x = threading.Thread(target=readValues, args=[screen])
 x.start()
 mainloop()
 closed = True
